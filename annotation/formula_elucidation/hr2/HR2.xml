@@ -1,0 +1,206 @@
+<tool id="hr2" name="HR2 formula" version="2014-05-07">
+  <description>
+        find a formula for the masses
+  </description>
+  <command interpreter="perl">
+  	#if str($input_type.choice) == "YES":
+        hr2_manager.pl
+        -input "${input_type.input}" -colId "${input_type.colId}" -nbHeader "${input_type.nbHeader}" -colmass "${input_type.colmass}"
+    #else:
+        hr2_manager.pl 
+        -masse "${input_type.masse}"
+    #end if
+      -tolerance "$tol" -mode "$mode" -charge "$qtCharge" -regleOr "$regleOr" -atome "$atome"
+      -output1 "$variableMetadata" -outputView "$hr2ResView"
+  </command>
+  <inputs>
+  	<conditional name="input_type">
+      <param name="choice" type="select" label="Would you use a file " help="if 'NO' is selected then one or more mass(es) must be entered manually">
+        <option value="YES">YES</option>
+        <option value="NO">NO</option>
+      </param>
+      <when value="YES">
+        <param name="input" label="File of masses " format="tabular" type="data" />
+        <param name="colId" label="Column of Id " type="data_column" data_ref="input" accept_default="true" />
+	    <param name="nbHeader" label="Number of header lines " type="integer" value="0" size="10" help="number of lines not containing values"/>
+	    <param name="colmass" label="Column of masses " type="data_column" data_ref="input" accept_default="true" />
+      </when>
+      <when value="NO">
+        <param name="masse" size="20" type="text" label="Mass of the molecule "  help="For a masses list, writes : m1 m2 m3 / You can also separate yours values with dot (.) or coma (,)"/>
+      </when>
+    </conditional>
+  	
+  	<param name="tol" label="Delta of mass (mmu) " type="float" value="1.0" size="10" help="Tolerance should be between 0 and  9.0..."/>
+    <param name="mode" label="Ionization type of the molecule list " type="select" display="radio" help="Use neutral only if only if the masses correspond to molecules and not to ions : query doesn't be a [M+H] or [M-H] ion">
+      <option value="positive">positive</option>
+      <option value="negative">negative</option>
+      <option value="neutral">neutral</option>
+    </param>
+    <param name="qtCharge" label="Molecule initial charge " type="select" help="Use 0 if the molecule is not charged">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <!--<option value="2">2</option>
+      <option value="3">3</option>-->
+    </param>
+	<param name="regleOr" label="Use only the first 3 golden rules " type="select" help="Use 'yes' if you want more empirical formulas">
+      <option value="NO">No</option>
+      <option value="YES">Yes</option>
+    </param>
+    <param name="atome" label="Add some atom(s) from following list if needed " type="select" display="checkboxes" multiple="True" help="C, H, N et O are always selected">
+      <option value="P">P</option>
+      <option value="S">S</option>
+      <option value="F">F</option>
+      <option value="L">Cl</option>
+      <option value="K">K</option>
+      <option value="B">Br</option>
+      <option value="A">Na</option>
+      <option value="1">13C</option>
+    </param>
+  </inputs>
+  <outputs>
+    <data name="variableMetadata" format="tabular" label="${tool.name}_Results"/>
+    <data name="hr2ResView" format="html" label="${tool.name}_View"/>
+  </outputs>
+
+  <help>
+
+.. class:: infomark
+
+**Authors** Marion Landi marion.landi@clermont.inra.fr and Franck Giacomoni franck.giacomoni@clermont.inra.fr
+
+HR2 original program and its documentation are Copyright (c) 1992-2005 by Joerg Hau under GNU General Public License ("GPL")
+
+
+---------------------------------------------------
+
+.. class:: infomark
+
+**Please cite** If you use this tool, please cite `Tobias Kind and Oliver Fiehn. (2007). "Seven Golden Rules for heuristic filtering of molecular formulas obtained by accurate mass spectrometry." BMC Bioinformatics p8:105 &lt;http://www.ncbi.nlm.nih.gov/pubmed/17389044&gt;`_
+
+`HR2 original program and its documentation are under GNU General Public License ("GPL") : GPL is a"contaminating" license. &lt;http://fiehnlab.ucdavis.edu/projects/Seven_Golden_Rules/Software/&gt;`_
+
+
+---------------------------------------------------
+
+==============
+HR2 formula
+==============
+
+-----------
+Description
+-----------
+
+ | Find a formula for the masses
+ | only molecules with carbon (C) will be search
+
+
+-----------------
+Workflow position
+-----------------
+
+
+.. image:: ./static/images/metabolomics/hr2.png
+        :width: 800
+
+
+
+
+-----------
+Input files
+-----------
+
++-------------------------+-----------+
+| Parameter : num + label |  Format   |
++=========================+===========+
+| 1 : variableMetadata    |  tabular  |
++-------------------------+-----------+
+
+File variableMetadata must have at least the 2 following columns : 
+	* Id : column to identify masses in the csv/tsv input file
+	* Masses : column with all the masses in the csv/tsv input file
+
+
+----------
+Parameters
+----------
+
+Would you use a file
+	| Choose whether the masses are in a file or entered manually
+	| YES (default) : parameters **File of masses ; Column of Id ; Number of header ; Column of masses** are visible
+	| NO : parameter **Mass of the molecule** is visible
+	|
+
+
+If 'use file'='YES'
+
+Column of Id
+	| Specify the column number for the id in the csv/tsv input file
+	|
+
+Number of header lines
+	| Number of lines not containing values 
+	|
+
+Column of masses
+	| Specify the column number for the mass in the csv/tsv input file
+	|
+
+If 'use file'='NO'
+
+Mass of the molecule
+	| Specify a list of mass to request
+	| one or more mass(es) entered manually
+	| For a masses list, writes : m1,m2,m3
+	| You must separate yours values with coma (,)
+	| dot (.) is for float number
+	|
+
+In all cases :
+
+Delta
+	| Tolerance of the gap in the mass
+	| It should be between 0 and 9.0
+
+Ionization
+	| Type of ionization of the molecule : *positif, negatif, neutral*
+	| Use neutral if query doesn't be a [M+H] or [M-H] ion
+	| HR2 knows only the weight of uncharged molecules
+	| so we made ​​a correction to the masses of the value of a proton before the search
+	| if the masses are those from a spectrometry in positive or negatif mode.
+	| **neutral** : will do a search on the mass unchanged.
+
+Initial charge
+	| Use 0 if the molecule is not basically charged
+
+Golden rules
+	| There are 7 golden rules
+	| Some are too stringent, especially for small molecules
+	| Use 'yes' if you want more empirical formulas
+
+Add some atom(s)
+	List of atoms that can be searched in addition to the molecule : *P, S, F, Cl, K, Br, Na, 13C*
+
+------------
+Output files
+------------
+
+Two types of files
+	| hr2_VIEW.HTML : for viewing result via HTML.
+	| hr2_TSV.tabular : for linking with others modules.
+	| an excel-like output will be available. 
+	
+---------------------------------------------------
+
+
+---------------
+Working example
+---------------
+
+
+.. class:: warningmark
+
+The corresponding "Page" is coming soon.
+
+	</help>
+</tool>
+

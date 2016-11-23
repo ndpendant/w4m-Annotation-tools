@@ -1,0 +1,11 @@
+## Conf file for wsdl_hmdb.pl script
+#
+## Version 1.0 -- edited by F.Giacomoni 
+## Build january 27th 2014
+## release 
+#
+## ARGVT
+#
+## HTML OUTPUT : 
+HTML_ENTRIES_PER_PAGE=4
+HTML_TEMPLATE=/galaxy/dist/galaxy-pfem/tools/metabolomics/annotation/banks_queries/hmdb/hmdb.tmpl

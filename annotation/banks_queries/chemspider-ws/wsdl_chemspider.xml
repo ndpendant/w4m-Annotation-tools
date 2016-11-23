@@ -1,0 +1,154 @@
+<tool id="wsdl_chemspider" name="Chemspider " version="2014-05-07">
+  <description>
+       Search and share chemistry.
+  </description>
+  <command interpreter="perl">
+    wsdl_chemspider.pl
+    #if str($input_type.choice) == "YES":
+      -masses="${input_type.masses}" -colid="${input_type.colid}" -lineheader="${input_type.lineheader}" -colfactor="${input_type.colfactor}"
+    #else:
+      -mass="${input_type.mass}"
+    #end if
+    -delta="$delta" -output="$variableMetadata" -view="$chemspiderResView"
+  </command>
+  
+  <inputs>
+  	<conditional name="input_type">
+      <param name="choice" type="select" label="Would you use a file " help="if 'NO' is selected then one or more mass(es) must be entered manually">
+        <option value="YES">YES</option>
+        <option value="NO">NO</option>
+      </param>
+      <when value="YES">
+        <param name="masses" label="File of masses (Variable metadata)" format="tabular" type="data" />
+        <param name="colid" label="Column of Id " type="data_column" data_ref="masses" accept_default="true" />
+	    <param name="lineheader" label="Number of header lines " type="integer" value="0" size="10" help="number of lines not containing values"/>
+	    <param name="colfactor" label="Column of masses " type="data_column" data_ref="masses" accept_default="true" />
+      </when>
+      <when value="NO">
+        <param name="mass" size="20" type="text" label="Mass of the molecule "  help="For a masses list writes : m1,m2,m3"/>
+      </when>
+    </conditional>
+	<param name="delta" label="Delta of mass " type="float" value="0.001" min="0.0000000000000001" max="5" size="10" help="Default value is 0.001 for Chemspider."/>
+  </inputs>
+  
+  <outputs>
+    <data name="variableMetadata" label="${tool.name}_TSV" format="tabular" />
+    <data name="chemspiderResView" label="${tool.name}_VIEW" format="html" />
+  </outputs>
+  
+  <stdio>
+        <exit_code range="1:" level="fatal" />
+  </stdio>
+
+  <help>
+
+.. class:: infomark
+
+**Authors** Nils PAULHE (for Java), Marion LANDI and Franck Giacomoni (for Galaxy) 
+
+---------------------------------------------------
+
+.. class:: infomark
+
+**Please cite** If you use this tool, please cite KEGG.
+
+
+for `ChemSpider. &lt;http://www.chemspider.com&gt;`_ :
+  `Pence, H.E. and A.J. Williams, (2010). "ChemSpider: An Online Chemical Information Resource." J.Chem. Educ., 87(11): p. 1123-1124. &lt;http://pubs.acs.org/doi/abs/10.1021/ed100697w&gt;`_
+
+---------------------------------------------------
+
+===============
+wsdl_chemspider
+===============
+
+
+-----------
+Description
+-----------
+
+Finding informations by using ChemSpider web service and exploring more than 500 databases references.
+
+
+-----------------
+Workflow position
+-----------------
+
+
+.. image:: ./static/images/metabolomics/chemspider-ws.png
+        :width: 800
+
+-----------
+Input files
+-----------
+
++-------------------------+-----------+
+| Parameter : num + label |  Format   |
++=========================+===========+
+| 1 : variableMetadata    |  tabular  |
++-------------------------+-----------+
+
+File variableMetadata must have at least the 2 following columns : 
+	* Ids : column to identify masses in the csv/tsv input file
+	* Masses : column containing masses in the csv/tsv input file
+
+
+----------
+Parameters
+----------
+
+Would you use a file
+	| Choose whether the masses are in a file or entered manually
+	| YES (default) : parameters **File of masses ; Column of Id ; Number of header ; Column of masses** are visible
+	| NO : parameter **Mass of the molecule** is visible
+	|
+
+If 'use file'='YES'
+
+Column of Id
+	| Specify the column number for the id in the csv/tsv input file
+	|
+
+Number of header lines
+	| Number of lines not containing values 
+	|
+
+Column of masses
+	| Specify the column number for the mass in the csv/tsv input file
+	|
+
+If 'use file'='NO'
+
+Mass of the molecule
+	| Specify a list of mass to request one or more mass(es) entered manually
+	| For a masses list, writes : m1,m2,m3
+	| you must separate yours values with coma (,)
+	| dot (.) is for float number
+	|
+
+Delta of mass (mmu)
+	| Specify a delta (+/-) on the mass for the search.
+
+------------
+Output files
+------------
+
+Two types of files
+	| wsdl_chemspider_VIEW.HTML : for viewing result via HTML.
+	| wsdl_chemspider_TSV.tabular : for linking with others modules.
+	| an excel-like output will be available. 
+	
+---------------------------------------------------
+
+
+---------------
+Working example
+---------------
+
+
+.. class:: warningmark
+
+The corresponding "Page" coming soon.
+	
+	</help>
+</tool>

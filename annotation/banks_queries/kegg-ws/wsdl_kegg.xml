@@ -1,0 +1,150 @@
+<tool id="wsdl_kegg" name="Kegg Compounds" version="2014-05-07">
+  <description>
+       a Kyoto Encyclopedia of Genes and Genomes small molecules database.
+  </description>
+  <command interpreter="perl">
+    wsdl_kegg.pl
+    #if str($input_type.choice) == "YES":
+      -masses="${input_type.masses}" -colid="${input_type.colid}" -lineheader="${input_type.lineheader}" -colfactor="${input_type.colfactor}"
+    #else:
+      -mass="${input_type.mass}"
+    #end if
+    -delta="$delta" -output="$variableMetadata" -view="$keggResView"
+  </command>
+  
+  <inputs>
+  	<conditional name="input_type">
+      <param name="choice" type="select" label="Would you use a file " help="if 'NO' is selected then one or more mass(es) must be entered manually">
+        <option value="YES">YES</option>
+        <option value="NO">NO</option>
+      </param>
+      <when value="YES">
+        <param name="masses" label="File of masses (Variable metadata)" format="tabular" type="data" />
+        <param name="colid" label="Column of Id " type="data_column" data_ref="masses" accept_default="true" />
+	    <param name="lineheader" label="Number of header lines " type="integer" value="0" size="10" help="number of lines not containing values"/>
+	    <param name="colfactor" label="Column of masses " type="data_column" data_ref="masses" accept_default="true" />
+      </when>
+      <when value="NO">
+        <param name="mass" size="20" type="text" label="Mass of the molecule "  help="For a masses list writes : m1,m2,m3"/>
+      </when>
+    </conditional>
+	<param name="delta" label="Delta of mass " type="float" value="0.5" min="0.0000000000000001" max="10" size="10" help="Default value is 0.5 for KEGG (max : 10)."/>
+  </inputs>
+  
+  <outputs>
+    <data name="variableMetadata" label="${tool.name}_TSV" format="tabular" />
+    <data name="keggResView" label="${tool.name}_VIEW" format="html" />
+  </outputs>
+
+  <help>
+
+.. class:: infomark
+
+**Authors** Nils PAULHE (for Java), Marion LANDI and Franck Giacomoni (for Galaxy) 
+
+---------------------------------------------------
+
+.. class:: infomark
+
+**Please cite** If you use this tool, please cite KEGG.
+
+
+`KEGG. &lt;http://www.genome.jp/kegg&gt;`_ :
+  `Kanehisa, M., S. Goto, et al. (2012). "KEGG for integration and interpretation of large-scale molecular data sets." Nucleic Acids Research 40(D1): D109-D114 &lt;http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3245020/&gt;`_
+
+---------------------------------------------------
+
+==============
+wsdl_kegg
+==============
+
+-----------
+Description
+-----------
+
+Finding information in the database KEGG via a web service from masses.
+
+-----------------
+Workflow position
+-----------------
+
+
+.. image:: ./static/images/metabolomics/kegg-ws.png
+        :width: 800
+
+
+-----------
+Input files
+-----------
+
++-------------------------+-----------+
+| Parameter : num + label |  Format   |
++=========================+===========+
+| 1 : variableMetadata    |  tabular  |
++-------------------------+-----------+
+
+File variableMetadata must have at least the 2 following column : 
+	* Id : column to identify masses in the csv/tsv input file
+	* Masses : column with all the masses in the csv/tsv input file
+
+
+----------
+Parameters
+----------
+
+Would you use a file
+	| Choose whether the masses are in a file or entered manually
+	| YES (default) : parameters **File of masses ; Column of Id ; Number of header ; Column of masses** are visible
+	| NO : parameter **Mass of the molecule** is visible
+	|
+
+If 'use file'='YES'
+
+Column of Id
+	| Specify the column number for the id in the csv/tsv input file
+	|
+
+Number of header lines
+	| Number of lines not containing values 
+	|
+
+Column of masses
+	| Specify the column number for the mass in the csv/tsv input file
+	|
+
+If 'use file'='NO'
+
+Mass of the molecule
+	| Specify a list of mass to request
+	| one or more mass(es) entered manually
+	| For a masses list, writes : m1,m2,m3
+	| You must separate yours values with coma (,)
+	| dot (.) is for float number
+	|
+
+Delta of mass (mmu)
+	| Specify a delta (+/-) to the mass to search - This value is a float, between 0.0000000000000001 and 10.
+
+------------
+Output files
+------------
+
+Two types of files
+	| wsdl_kegg_VIEW.HTML : for viewing result via HTML.
+	| wsdl_kegg_TSV.tabular : for linking with others modules.
+	| an excel-like output will be available. 
+	
+---------------------------------------------------
+
+
+---------------
+Working example
+---------------
+
+
+.. class:: warningmark
+
+The corresponding "Page" is coming soon.
+	
+	</help>
+</tool>
